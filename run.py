@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -9,26 +10,23 @@ powers = int(sys.argv[2])
 
 print("We are running {} trials up to {} pages".format(num_trials, 2**powers))
 
-# start from 2 and go up by powers of 2 to 1028 pages
-num_pages = 2
+x = np.arange(powers + 1)
+num_pages = 2**x
 
-x = []
 y = []
 
-for i in range(powers):
+for pages in num_pages:
     result = subprocess.run(
-        [bin_path, str(num_trials), str(num_pages)], capture_output=True
+        [bin_path, str(num_trials), str(pages)], capture_output=True
     )
-    x.append(int(num_pages))
     y.append(float(result.stdout.decode()))
-    num_pages *= 2
 
 print(x)
 print(y)
 
 plt.plot(x, y, marker="o")
 
-plt.xticks(x, x, fontsize="x-small")
+plt.xticks(x, num_pages, fontsize="small")
 plt.xlabel("Number of pages")
 plt.ylabel("Nanoseconds per access")
 
