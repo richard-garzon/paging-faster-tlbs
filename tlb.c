@@ -1,8 +1,11 @@
+#define _GNU_SOURCE
 #include <bits/time.h>
+#include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 int main(int argc, char **argv)
 {
@@ -13,11 +16,12 @@ int main(int argc, char **argv)
 			   "num pages\n");
 	}
 
-	int page_size = 4096;
+	int page_size = getpagesize();
+	printf("page size is %d bytes\n", page_size);
 	int jump = page_size / sizeof(int);
 
-	int num_trials = atoi(argv[1]); // 10000000
-	int num_pages = atoi(argv[2]);	// 32
+	int num_trials = atoi(argv[1]);
+	int num_pages = atoi(argv[2]);
 
 	int a[num_pages * jump];
 
@@ -26,7 +30,11 @@ int main(int argc, char **argv)
 
 	struct timespec start, end;
 
-	// TODO: pin this thread to a single CPU
+	// pin this thread to a single CPU
+	cpu_set_t set;
+	CPU_ZERO(&set);
+	CPU_SET(0, &set);
+	sched_setaffinity(0, sizeof(cpu_set_t), &set);
 
 	clock_gettime(CLOCK_MONOTONIC, &start);
 
@@ -42,17 +50,16 @@ int main(int argc, char **argv)
 	}
 
 	clock_gettime(CLOCK_MONOTONIC, &end);
-
-	printf("Done\n");
-
 	long time_seconds = end.tv_sec - start.tv_sec;
 	long time_nanoseconds = end.tv_nsec - start.tv_nsec;
 
 	double elapsed_ns = time_seconds * 1000000000L + time_nanoseconds;
-	double average_time = elapsed_ns / jump / num_trials;
+	double average_time = elapsed_ns / (num_pages * num_trials);
 
 	printf("Average nanoseconds per access for %d pages: %f\n", num_pages,
 		   average_time);
+	printf("Total elapsed time in nanoseconds for %d pages: %f\n", num_pages,
+		   (elapsed_ns / num_trials));
 
 	return 0;
 }
