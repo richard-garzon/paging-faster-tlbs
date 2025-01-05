@@ -23,9 +23,12 @@ for i in range(powers):
     y.append(float(result.stdout.decode()))
     num_pages *= 2
 
+print(x)
+print(y)
+
 plt.plot(x, y, marker="o")
 
-plt.xticks(x, x, fontsize="small")
+plt.xticks(x, x, fontsize="x-small")
 plt.xlabel("Number of pages")
 plt.ylabel("Nanoseconds per access")
 

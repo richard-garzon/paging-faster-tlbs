@@ -3,7 +3,6 @@
 #include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -22,10 +21,7 @@ int main(int argc, char **argv)
 	int num_trials = atoi(argv[1]);
 	int num_pages = atoi(argv[2]);
 
-	int a[num_pages * jump];
-
-	// init array to 0 to avoid demand paging showing up in loop
-	memset(a, 0, num_pages * jump);
+	int *a = calloc(num_pages, page_size);
 
 	struct timespec start, end;
 
