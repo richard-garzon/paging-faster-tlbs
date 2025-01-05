@@ -17,7 +17,6 @@ int main(int argc, char **argv)
 	}
 
 	int page_size = getpagesize();
-	printf("page size is %d bytes\n", page_size);
 	int jump = page_size / sizeof(int);
 
 	int num_trials = atoi(argv[1]);
@@ -54,12 +53,18 @@ int main(int argc, char **argv)
 	long time_nanoseconds = end.tv_nsec - start.tv_nsec;
 
 	double elapsed_ns = time_seconds * 1000000000L + time_nanoseconds;
-	double average_time = elapsed_ns / (num_pages * num_trials);
+	double average_time = elapsed_ns / ((double)num_pages * num_trials);
 
+	/*
 	printf("Average nanoseconds per access for %d pages: %f\n", num_pages,
 		   average_time);
 	printf("Total elapsed time in nanoseconds for %d pages: %f\n", num_pages,
 		   (elapsed_ns / num_trials));
+	*/
+
+	// print just the average ns per access so the python script can easily
+	// parse this
+	printf("%f", average_time);
 
 	return 0;
 }
